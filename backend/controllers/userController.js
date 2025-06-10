@@ -48,7 +48,7 @@ try {
 
      res.cookie("token",token,{
         httpOnly:true,
-        sameSite:'Lax',
+        sameSite:'None',
         maxAge:4*24*60*60*1000,
         secure:true
      })
