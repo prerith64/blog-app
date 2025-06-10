@@ -11,7 +11,7 @@ const Navbar = () => {
     <header className='w-full bg-white shadow font-semibold text-xl z-2 mb-16'>
       <nav className='m-auto container flex py-4 items-center justify-between'>
         <h1 className='text-3xl font-extrabold text-purple-800 italic'>
-          Plese
+          Blog..
         </h1>
         <ul className='flex gap-4 '>
           <li>
