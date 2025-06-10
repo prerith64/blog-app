@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+       - "3000:3000"
+    environment:
+       - MONGO_URL=mongodb://mongo:27017/blogdb
+       - SECRET_KEY=ddaf43f2cf285a9a7cc1bcfaaaa3c1a92d6faf4f54df38d372870000afd39071b961b996d679b596c0978a4dd8ba6a8471f3e27b50b35081261913c710191af2
+    depends_on:
+       - mongo
+
+
+  mongo:
+    image: mongo:7
+    restart: always
+    ports:
+       - "27017:27017"
+    volumes:
+       - mongo_data:/data/db
+
+  frontend:
+    build: ./frontend
+    ports: 
+      - "5173:5173"
+    depends_on:
+      - backend
+
+
+volumes:
+  mongo_data:
