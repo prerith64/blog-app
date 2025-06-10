@@ -68,6 +68,6 @@ export const me = async (req, res) => {
 
 
 export const logout = async(req,res) => {
-res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'Lax' });
+res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'None' });
    return res.json({ message: 'Logged out' });
 }
