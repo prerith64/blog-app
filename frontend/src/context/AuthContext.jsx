@@ -3,110 +3,114 @@ import api from '../api';
 
 
 const AuthContext = createContext();
+export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [authError, setAuthError] = useState(null);
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [loading, setLoading] = useState(true); // NEW
 
-export const AuthProvider = ({children}) => {
-
-    const [isAuthenticated,setIsAuthenticated] = useState(false)    
-    const [userId, setUserId] = useState(null) 
-     const [authError,setAuthError] = useState(null)
-      const [blogPosts, setBlogPosts] = useState(
-        []
-      );
-
-   const Signup = async(formData) =>{
-     try {
-       await api.post('/user/signup',formData);
-     } catch (error) {
-      setAuthError(error.response?.data?.message || 'Signup failed')
-     }
-      
-   }
-
- useEffect(() => {
-  api.get('/user/me')
-    .then(res => {
-      setIsAuthenticated(true)
-      setUserId(res.data.id)
-    })
-    .catch(() => {
-      setIsAuthenticated(false)
-      setUserId(null)
-    })
-  getAllBlog()
-}, [])
-
-    const Login = async (email, password) => {
+  const Signup = async (formData) => {
     try {
-      await api.post('/user/login', { email, password })
-    
-        setIsAuthenticated(true);
-        setAuthError(null)
-      
+      await api.post('/user/signup', formData);
     } catch (error) {
-      setAuthError(error.response?.data?.message || 'Login failed')
+      setAuthError(error.response?.data?.message || 'Signup failed');
     }
-  }
+  };
 
-
-  const updateBlog = async (blogId, updatedData) => {
-  try {
-  
-    const res = await api.put(`/blog/update/${blogId}`, updatedData)
-     await getAllBlog();
-    return res.data // { message: "Blog updated successfully!" }
-  } catch (error) {
-    throw error.response?.data?.message || 'Update failed'
-  }
-}
-
-    const Logout = async() => {
-      await api.get('/user/logout');
-    setIsAuthenticated(false)
-    window.location.reload() 
-    }
-
-
-    const deleteBlog = async(blogId) =>{
-     try {
-      const res = await api.delete(`/blog/delete/${blogId}`);
-     await getAllBlog();
-     return res.data
-     } catch (error) {
-       throw error.response?.data?.message || 'Delete failed'
-     }
-    }
-
-
- const addBlog = async (newPost) => {
+  const Login = async (email, password) => {
     try {
-      await api.post('/blog/add', newPost)
-      await getAllBlog() // Refresh the blog list after adding
+      await api.post('/user/login', { email, password });
+  
+      setIsAuthenticated(true);
+      setAuthError(null);
+    } catch (error) {
+      setAuthError(error.response?.data?.message || 'Login failed');
+    }
+  };
+
+  const Logout = async () => {
+    await api.get('/user/logout');
+    setIsAuthenticated(false);
+    setUserId(null);
+    window.location.reload();
+  };
+
+  const getAllBlog = async () => {
+    try {
+      const res = await api.get('/blog/all');
+      setBlogPosts(res.data.blogs || []);
+    } catch (error) {
+      setBlogPosts([]);
+    }
+  };
+
+  const addBlog = async (newPost) => {
+    try {
+      await api.post('/blog/add', newPost);
+      await getAllBlog();
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
- const getAllBlog = async () => {
+  const updateBlog = async (blogId, updatedData) => {
     try {
-      const res = await api.get('/blog/all')
-      console.log(res.data.blogs);
-      
-      setBlogPosts(res.data.blogs || [])
-      
-        // Adjust according to your backend response
+      const res = await api.put(`/blog/update/${blogId}`, updatedData);
+      await getAllBlog();
+      return res.data;
     } catch (error) {
-      setBlogPosts([])
+      throw error.response?.data?.message || 'Update failed';
     }
-  }
+  };
 
+  const deleteBlog = async (blogId) => {
+    try {
+      const res = await api.delete(`/blog/delete/${blogId}`);
+      await getAllBlog();
+      return res.data;
+    } catch (error) {
+      throw error.response?.data?.message || 'Delete failed';
+    }
+  };
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await api.get('/user/me');
+        setIsAuthenticated(true);
+        setUserId(res.data.id);
+      } catch (error) {
+        setIsAuthenticated(false);
+        setUserId(null);
+      } finally {
+        setLoading(false); // FINISH CHECK
+      }
+    };
 
+    fetchUser();
+    getAllBlog();
+  }, []);
 
   return (
-    <AuthContext.Provider  value={{blogPosts,addBlog,Login,Signup,authError,Logout,isAuthenticated,userId,updateBlog,deleteBlog}} >
-     {children}
+    <AuthContext.Provider
+      value={{
+        blogPosts,
+        addBlog,
+        Login,
+        Signup,
+        authError,
+        Logout,
+        isAuthenticated,
+        userId,
+        updateBlog,
+        deleteBlog,
+        loading, // expose loading
+      }}
+    >
+      {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export const useAuth=()=>useContext(AuthContext);

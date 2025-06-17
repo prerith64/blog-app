@@ -7,7 +7,7 @@ services:
        - "3000:3000"
     environment:
        - MONGO_URL=mongodb://mongo:27017/blogdb
-       - SECRET_KEY=ddaf43f2cf285a9a7cc1bcfaaaa3c1a92d6faf4f54df38d372870000afd39071b961b996d679b596c0978a4dd8ba6a8471f3e27b50b35081261913c710191af2
+       - SECRET_KEY="add_secret_key"
     depends_on:
        - mongo
 

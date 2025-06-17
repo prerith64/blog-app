@@ -22,6 +22,8 @@ const Login = () => {
     await Login(formData.email, formData.password)
     if (!authError) {
       navigate('/')
+      window.location.reload();
+
     }
   }
 
